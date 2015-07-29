@@ -1,6 +1,6 @@
 module Spree
   class OffsitePayment::Dotpay < PaymentMethod
-    include OffsitePayments::Integrations
+    require 'offsite_payments'
     preference :account_id, :string
     preference :pin, :string
     # Comma separated string with ip addresses
