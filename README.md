@@ -15,7 +15,9 @@ gem 'spree_dotpay'
 ```
 
 2. Bundle your dependencies:
-  bundle install
+
+```bundle install
+```
 
 3. Restart your server
 
