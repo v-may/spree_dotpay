@@ -6,7 +6,7 @@ Spree::CheckoutController.class_eval do
     def pay_via_dotpay
       order = current_order
       return unless order && ["payment", "confirm"].include?(order.state)
-      return if order.paid?
+      return if order.paid? || !order.payment_required?
 
       if order.payment?
         return if order.has_step?("confirm")
