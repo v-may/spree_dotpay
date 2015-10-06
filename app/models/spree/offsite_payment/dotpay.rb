@@ -29,7 +29,7 @@ module Spree
       
       service.description = order_description order
       service.control = order.number
-      service.amount = order.outstanding_balance.to_s
+      service.amount = payment_amount(order).to_s
       service.currency = order.currency
       
       bill_address = order.bill_address
@@ -77,6 +77,13 @@ module Spree
     private
       def order_description(order)
         "#{Spree::Store.current.name} #{Spree.t(:order).downcase} ##{order.number}"
+      end
+
+      def payment_amount(order)
+        pm = order.payments.checkout.find { |p| p.payment_method.is_a?(Spree::OffsitePayment::Dotpay) }
+        return pm.amount if pm.present?
+
+        order.outstanding_balance
       end
   end
 end

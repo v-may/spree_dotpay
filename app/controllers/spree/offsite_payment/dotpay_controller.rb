@@ -31,9 +31,10 @@ module Spree
         if notice.complete?
           order_number = payment_method.order_number_from notice 
           order = Spree::Order.find_by_number order_number
-          payment = order.payments.create!(
-                                           :amount => notice.gross, 
-                                           :payment_method_id => payment_method.id)
+          payment = order.payments.find_or_create_by!(
+                                                      state: :checkout,
+                                                      amount: notice.gross, 
+                                                      payment_method_id: payment_method.id)
           payment.complete
           order.reload
           order.next

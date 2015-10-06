@@ -11,12 +11,11 @@ Spree::CheckoutController.class_eval do
       if order.payment?
         return if order.has_step?("confirm")
         payment_method = Spree::PaymentMethod.find(params[:order][:payments_attributes].first[:payment_method_id])
+        return unless payment_method.kind_of?(Spree::OffsitePayment::Dotpay)
       else
-        payment = order.payments.checkout.first
+        payment = order.payments.checkout.find { |p| p.payment_method.is_a?(Spree::OffsitePayment::Dotpay) }
         return unless payment
-        payment_method = payment.payment_method
       end
-      return unless payment_method.kind_of?(Spree::OffsitePayment::Dotpay)
 
       redirect_to offsite_payment_dotpay_path and return false
     end
