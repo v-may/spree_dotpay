@@ -29,16 +29,23 @@ module Spree
       notice = payment_method.notification request.raw_post
       if notice.valid_sender?(request.remote_ip) && notice.acknowledge
         if notice.complete?
-          order_number = payment_method.order_number_from notice 
-          order = Spree::Order.find_by_number order_number
-          payment = order.payments.find_or_create_by!(
-                                                      state: :checkout,
-                                                      amount: notice.gross, 
-                                                      payment_method_id: payment_method.id)
-          payment.complete
-          order.reload
-          order.next
-          order.next if order.confirm?
+          dotpay_notice = Spree::DotpayNotice.find_or_create_by!(transaction_id: notice.params['t_id'], transaction_status: notice.params['t_status'])
+          unless dotpay_notice.processed?
+            order_number = payment_method.order_number_from notice 
+            order = Spree::Order.find_by_number order_number
+
+            payment = order.payments.find_or_create_by!(
+                                                        state: :checkout,
+                                                        amount: notice.gross, 
+                                                        payment_method_id: payment_method.id)
+            payment.update(response_code: notice.params['t_id'])
+            payment.complete
+            order.reload
+            order.next
+            order.next if order.confirm?
+
+            dotpay_notice.update(order: order)
+          end
         end
 
         render text: 'OK'

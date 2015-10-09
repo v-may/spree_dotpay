@@ -19,7 +19,15 @@ gem 'spree_dotpay'
 ```bundle install
 ```
 
-3. Restart your server
+3. Copy the migrations in your app:
+
+    bundle exec rake railties:install:migrations
+
+4. Run database migrations in your app:
+
+    bundle exec rake db:migrate
+
+5. Restart your server
 
 Configuration
 -------------
